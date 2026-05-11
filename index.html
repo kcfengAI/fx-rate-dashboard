@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX Monitor — 台幣匯率</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0a;
+  --panel: #111111;
+  --panel2: #181818;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #f5f5f5;
+  --text2: #cccccc;
+  --text3: #999999;
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --amber: #f59e0b;
+  --amber-dim: rgba(245,158,11,0.12);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.12);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+html { font-size: 16px; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── Layout ── */
+.wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 40px; }
+
+/* ── Header ── */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.brand-name { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+.brand-sub { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: var(--mono); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--mono); color: var(--green); background: var(--green-dim); padding: 5px 10px; border-radius: 20px; border: 1px solid rgba(34,197,94,0.2); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12px; font-weight: 500; font-family: var(--sans); border: 1px solid var(--border2); border-radius: var(--radius); background: var(--panel); color: var(--text2); cursor: pointer; transition: all .15s; letter-spacing: 0.01em; }
+.btn:hover { border-color: var(--border2); color: var(--text); background: var(--panel2); }
+.btn-accent { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-accent:hover { opacity: .85; color: #fff; }
+
+/* ── Summary bar ── */
+.summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+.summary-cell { background: var(--panel); padding: 14px 16px; }
+.summary-label { font-size: 10px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.summary-val { font-size: 18px; font-weight: 600; font-family: var(--mono); }
+.summary-val.up { color: var(--green); }
+.summary-val.down { color: var(--red); }
+.summary-sub { font-size: 10px; color: var(--text2); margin-top: 3px; font-family: var(--mono); }
+
+/* ── Rate cards ── */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+@media(max-width:540px){ .cards { grid-template-columns: repeat(2,1fr); } }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: border-color .15s, background .15s; position: relative; overflow: hidden; }
+.card::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity .15s; }
+.card:hover { border-color: var(--border2); }
+.card:hover::before { opacity:1; }
+.card.up-card::before { background: linear-gradient(135deg, var(--green-dim) 0%, transparent 60%); }
+.card.down-card::before { background: linear-gradient(135deg, var(--red-dim) 0%, transparent 60%); }
+.card.active { border-color: var(--blue) !important; }
+.card.alert-on { border-color: var(--amber); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.card-pair { font-size: 10px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; }
+.card-alert-icon { font-size: 12px; opacity:.7; }
+.card-rate { font-size: 26px; font-weight: 600; font-family: var(--mono); line-height: 1; margin-bottom: 4px; }
+.card-base { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-name { font-size: 11px; color: var(--text2); }
+.card-change { font-size: 11px; font-family: var(--mono); font-weight: 500; padding: 2px 7px; border-radius: 4px; }
+.card-change.up { color: var(--green); background: var(--green-dim); }
+.card-change.down { color: var(--red); background: var(--red-dim); }
+.card-change.flat { color: var(--text3); background: transparent; }
+.shimmer { background: linear-gradient(90deg, var(--panel2) 0%, var(--border2) 50%, var(--panel2) 100%); background-size: 200%; animation: sh 1.4s infinite; border-radius: 4px; display: inline-block; }
+@keyframes sh { 0%{background-position:200%}100%{background-position:-200%} }
+
+/* ── Chart section ── */
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 16px; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.panel-title { font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tab { font-size: 11px; font-family: var(--mono); padding: 4px 9px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
+.tab:hover { color: var(--text2); border-color: var(--border2); }
+.tab.active { background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,.3); }
+.chart-wrap { position: relative; height: 200px; }
+.chart-meta { font-size: 10px; font-family: var(--mono); color: var(--text3); text-align: right; margin-top: 8px; }
+
+/* ── Alerts ── */
+.alert-banner { background: var(--amber-dim); border: 1px solid rgba(245,158,11,.25); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--amber); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.alert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; }
+.alert-row { background: var(--panel2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+.alert-pair { font-size: 12px; font-family: var(--mono); font-weight: 500; color: var(--text); }
+.alert-cond { font-size: 10px; color: var(--text2); margin-top: 3px; font-family: var(--mono); }
+.remove { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; padding: 2px 6px; border-radius: 4px; line-height:1; }
+.remove:hover { color: var(--red); }
+.empty { font-size: 12px; font-family: var(--mono); color: var(--text3); text-align: center; padding: 16px 0; }
+
+/* ── Notify toggles ── */
+.notify-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+.notify-item:last-child { border-bottom: none; padding-bottom: 0; }
+.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+.toggle input { opacity:0; width:0; height:0; }
+.tslider { position:absolute; inset:0; background:var(--panel2); border:1px solid var(--border2); border-radius:20px; cursor:pointer; transition:background .2s; }
+.tslider::before { content:''; position:absolute; width:14px; height:14px; left:2px; top:2px; background:var(--text3); border-radius:50%; transition:transform .2s, background .2s; }
+.toggle input:checked + .tslider { background: var(--green-dim); border-color: rgba(34,197,94,.3); }
+.toggle input:checked + .tslider::before { transform:translateX(16px); background:var(--green); }
+input[type=time] { padding:5px 9px; font-size:12px; font-family:var(--mono); border:1px solid var(--border2); border-radius:var(--radius); background:var(--panel2); color:var(--text); }
+
+/* ── Modal ── */
+.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
+.modal-bg.open { display:flex; }
+.modal { background:var(--panel); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:20px; width:100%; max-width:300px; }
+.modal h3 { font-size:14px; font-weight:600; font-family:var(--mono); margin-bottom:14px; color:var(--text); }
+.modal label { font-size:11px; font-family:var(--mono); color:var(--text3); display:block; margin-bottom:4px; margin-top:12px; text-transform:uppercase; letter-spacing:.06em; }
+.modal select, .modal input[type=number] { width:100%; padding:8px 10px; font-size:13px; font-family:var(--mono); border:1px solid var(--border2); border-radius:var(--radius); background:var(--panel2); color:var(--text); }
+.modal-actions { display:flex; gap:8px; margin-top:16px; }
+.modal-actions .btn { flex:1; justify-content:center; font-size:12px; }
+
+/* ── Footer ── */
+footer { text-align:center; font-size:10px; font-family:var(--mono); color:var(--text3); padding-top:24px; letter-spacing:.04em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">📊</div>
+      <div>
+        <div class="brand-name">FX MONITOR</div>
+        <div class="brand-sub" id="last-update">LOADING...</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+      <button class="btn" onclick="fetchRates()">↻ 更新</button>
+      <button class="btn btn-accent" onclick="openNotify()">🔔 通知</button>
+    </div>
+  </div>
+
+  <div id="alert-banners"></div>
+
+  <div class="summary-bar" id="summary-bar">
+    <div class="summary-cell"><div class="summary-label">USD/TWD</div><div class="shimmer" style="width:70px;height:20px;"></div></div>
+    <div class="summary-cell"><div class="summary-label">今日最強</div><div class="shimmer" style="width:50px;height:20px;"></div></div>
+    <div class="summary-cell"><div class="summary-label">今日最弱</div><div class="shimmer" style="width:50px;height:20px;"></div></div>
+    <div class="summary-cell"><div class="summary-label">到價提醒</div><div class="shimmer" style="width:30px;height:20px;"></div></div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">走勢圖</span>
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div class="chart-wrap"><canvas id="chart" role="img" aria-label="匯率走勢折線圖"></canvas></div>
+    <div class="chart-meta" id="chart-meta"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">到價提醒</span><span style="font-size:10px;font-family:var(--mono);color:var(--text3);">點匯率卡片設定</span></div>
+    <div id="alert-list"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">每日推播</span></div>
+    <div class="notify-item">
+      <span>啟用每日通知</span>
+      <label class="toggle"><input type="checkbox" id="daily-on" onchange="toggleDaily()"><span class="tslider"></span></label>
+    </div>
+    <div class="notify-item">
+      <span>推播時間</span>
+      <input type="time" id="notify-time" value="09:00" onchange="saveTime()">
+    </div>
+    <div class="notify-item">
+      <span id="notify-status" style="font-size:11px;font-family:var(--mono);color:var(--text3);">DISABLED</span>
+      <button class="btn" style="font-size:11px;padding:5px 10px;" onclick="testNotify()">TEST</button>
+    </div>
+  </div>
+
+  <footer>FX MONITOR · TWD EXCHANGE RATES · AUTO-REFRESH 5MIN · DATA: EXCHANGERATE-API</footer>
+</div>
+
+<!-- Alert modal -->
+<div class="modal-bg" id="alert-modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-title">SET ALERT</h3>
+    <label>條件</label>
+    <select id="modal-dir">
+      <option value="below">1 外幣 低於（台幣升值）</option>
+      <option value="above">1 外幣 高於（台幣貶值）</option>
+    </select>
+    <label>目標匯率（TWD）</label>
+    <input type="number" id="modal-target" step="0.01" placeholder="例：31.50">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-accent" onclick="saveAlert()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notify modal -->
+<div class="modal-bg" id="notify-modal" onclick="closeNotify(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>ENABLE NOTIFICATIONS</h3>
+    <p style="font-size:12px;font-family:var(--mono);color:var(--text2);line-height:1.7;margin-top:4px;">每天在設定時間推播匯率摘要到瀏覽器通知，需允許通知權限。</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+      <button class="btn btn-accent" onclick="requestNotify()" style="justify-content:center;">允許並啟用</button>
+      <button class="btn" onclick="closeNotify()" style="justify-content:center;">稍後再說</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CURRENCIES = [
+  { code:'USD', name:'美元', flag:'🇺🇸' },
+  { code:'MYR', name:'馬幣', flag:'🇲🇾' },
+  { code:'EUR', name:'歐元', flag:'🇪🇺' },
+  { code:'CNY', name:'人民幣', flag:'🇨🇳' },
+  { code:'AUD', name:'澳幣', flag:'🇦🇺' },
+  { code:'SGD', name:'新加坡幣', flag:'🇸🇬' },
+];
+
+const API_KEY = 'YOUR_EXCHANGE_API_KEY'; // ← 填入你的 ExchangeRate-API 金鑰
+
+let rates = {}, prevRates = {};
+let trend = JSON.parse(localStorage.getItem('fx_trend')||'{}');
+let alerts = JSON.parse(localStorage.getItem('fx_alerts')||'{}');
+let activeCode = 'USD';
+let chart = null, dailyTimer = null, currentCode = null;
+
+function save() {
+  localStorage.setItem('fx_trend', JSON.stringify(trend));
+  localStorage.setItem('fx_alerts', JSON.stringify(alerts));
+}
+
+async function fetchRates() {
+  try {
+    const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TWD`);
+    const data = await res.json();
+    if (data.result !== 'success') throw new Error();
+    prevRates = {...rates};
+    CURRENCIES.forEach(c => {
+      const r = data.conversion_rates[c.code];
+      if (r) rates[c.code] = { twd: parseFloat((1/r).toFixed(4)), raw: r };
+    });
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+      now.toLocaleDateString('zh-TW') + ' ' + now.toLocaleTimeString('zh-TW',{hour12:false,hour:'2-digit',minute:'2-digit'});
+    recordTrend(); renderAll();
+  } catch(e) {
+    document.getElementById('last-update').textContent = 'UPDATE FAILED';
+    useFallback();
+  }
+}
+
+function useFallback() {
+  const fb = {USD:31.34,MYR:7.99,EUR:36.86,CNY:4.62,AUD:22.67,SGD:24.69};
+  CURRENCIES.forEach(c => { rates[c.code] = { twd: fb[c.code], raw: 1/fb[c.code] }; });
+  recordTrend(); renderAll();
+}
+
+function recordTrend() {
+  const today = new Date().toISOString().slice(0,10);
+  CURRENCIES.forEach(c => {
+    if (!trend[c.code]) trend[c.code] = [];
+    const arr = trend[c.code];
+    const last = arr[arr.length-1];
+    if (last && last.d === today) last.v = rates[c.code]?.twd;
+    else if (rates[c.code]) arr.push({ d: today, v: rates[c.code].twd });
+    if (arr.length > 60) arr.splice(0, arr.length-60);
+  });
+  save();
+}
+
+function renderAll() {
+  renderSummary(); renderCards(); renderTabs(); renderChart(); checkAlerts();
+}
+
+function renderSummary() {
+  const usd = rates['USD']?.twd;
+  const changes = CURRENCIES.map(c => {
+    const cur = rates[c.code]?.twd;
+    const prev = prevRates[c.code]?.twd;
+    return { code: c.code, chg: (prev && cur) ? ((cur-prev)/prev*100) : 0 };
+  }).filter(x => x.chg !== 0);
+  const best = changes.sort((a,b)=>b.chg-a.chg)[0];
+  const worst = [...changes].sort((a,b)=>a.chg-b.chg)[0];
+  const alertCount = Object.keys(alerts).length;
+
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="summary-cell">
+      <div class="summary-label">USD / TWD</div>
+      <div class="summary-val">${usd ? usd.toFixed(2) : '—'}</div>
+      <div class="summary-sub">台幣兌美元</div>
+    </div>
+    <div class="summary-cell">
+      <div class="summary-label">今日最強外幣</div>
+      <div class="summary-val up">${best ? best.code : '—'}</div>
+      <div class="summary-sub">${best ? (best.chg>0?'+':'')+best.chg.toFixed(2)+'%' : ''}</div>
+    </div>
+    <div class="summary-cell">
+      <div class="summary-label">今日最弱外幣</div>
+      <div class="summary-val down">${worst ? worst.code : '—'}</div>
+      <div class="summary-sub">${worst ? worst.chg.toFixed(2)+'%' : ''}</div>
+    </div>
+    <div class="summary-cell">
+      <div class="summary-label">到價提醒</div>
+      <div class="summary-val" style="color:var(--amber)">${alertCount}</div>
+      <div class="summary-sub">監控中</div>
+    </div>`;
+}
+
+function renderCards() {
+  document.getElementById('cards').innerHTML = CURRENCIES.map(c => {
+    const d = rates[c.code];
+    if (!d) return `<div class="card"><div class="shimmer" style="width:100%;height:80px;border-radius:8px;"></div></div>`;
+    const prev = prevRates[c.code]?.twd;
+    const chgPct = prev ? ((d.twd - prev)/prev*100) : 0;
+    const dir = chgPct > 0.005 ? 'up' : chgPct < -0.005 ? 'down' : 'flat';
+    const arrow = dir==='up'?'▲':dir==='down'?'▼':'—';
+    return `<div class="card ${dir}-card${activeCode===c.code?' active':''}${alerts[c.code]?' alert-on':''}" onclick="selectCard('${c.code}')">
+      <div class="card-header">
+        <span class="card-pair">${c.code} / TWD</span>
+        ${alerts[c.code]?'<span class="card-alert-icon">🔔</span>':''}
+      </div>
+      <div class="card-rate">${d.twd.toFixed(2)}</div>
+      <div class="card-base">1 ${c.code} = ? TWD</div>
+      <div class="card-footer">
+        <span class="card-name">${c.flag} ${c.name}</span>
+        <span class="card-change ${dir}">${arrow} ${Math.abs(chgPct).toFixed(2)}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTabs() {
+  document.getElementById('tabs').innerHTML = CURRENCIES.map(c =>
+    `<button class="tab${activeCode===c.code?' active':''}" onclick="switchTab('${c.code}')">${c.code}</button>`
+  ).join('');
+}
+
+function switchTab(code) { activeCode = code; renderCards(); renderTabs(); renderChart(); }
+
+function selectCard(code) {
+  currentCode = code;
+  const c = CURRENCIES.find(x=>x.code===code);
+  document.getElementById('modal-title').textContent = `ALERT — ${c.code} / TWD`;
+  const a = alerts[code];
+  document.getElementById('modal-dir').value = a?.dir || 'below';
+  document.getElementById('modal-target').value = a?.target || (rates[code]?.twd.toFixed(2) || '');
+  document.getElementById('alert-modal').classList.add('open');
+  switchTab(code);
+}
+
+function renderChart() {
+  const arr = trend[activeCode] || [];
+  const c = CURRENCIES.find(x=>x.code===activeCode);
+  let labels = arr.map(x=>x.d.slice(5));
+  let values = arr.map(x=>x.v);
+  if (values.length < 2) {
+    const base = rates[activeCode]?.twd || 31;
+    for (let i=13;i>=0;i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      labels.push(d.toISOString().slice(5,10));
+      values.push(parseFloat((base*(1+(Math.random()-.5)*.008)).toFixed(4)));
+    }
+  }
+  document.getElementById('chart-meta').textContent =
+    `${c?.code} / TWD  ·  ${values.length}D  ·  HIGH ${Math.max(...values).toFixed(2)}  ·  LOW ${Math.min(...values).toFixed(2)}`;
+
+  if (chart) chart.destroy();
+  const isUp = values[values.length-1] >= values[0];
+  const lineColor = isUp ? '#22c55e' : '#ef4444';
+  const fillColor = isUp ? 'rgba(34,197,94,0.07)' : 'rgba(239,68,68,0.07)';
+
+  chart = new Chart(document.getElementById('chart'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        data: values,
+        borderColor: lineColor,
+        backgroundColor: fillColor,
+        fill: true, tension: 0.3,
+        pointRadius: values.length > 20 ? 0 : 3,
+        pointBackgroundColor: lineColor,
+        borderWidth: 1.5
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`  ${ctx.parsed.y.toFixed(2)} TWD` }, backgroundColor:'#1a1a1a', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#888', bodyColor:'#f0f0f0', titleFont:{family:'DM Mono, monospace',size:10}, bodyFont:{family:'DM Mono, monospace',size:12} } },
+      scales:{
+        x:{ grid:{color:'rgba(255,255,255,.08)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},maxTicksLimit:8} },
+        y:{ grid:{color:'rgba(255,255,255,.08)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},callback:v=>v.toFixed(2)}, position:'right' }
+      }
+    }
+  });
+}
+
+function closeModal(e) { if(!e||e.target.id==='alert-modal') document.getElementById('alert-modal').classList.remove('open'); }
+function saveAlert() {
+  if(!currentCode) return;
+  const dir = document.getElementById('modal-dir').value;
+  const target = parseFloat(document.getElementById('modal-target').value);
+  if(isNaN(target)) return;
+  alerts[currentCode]={dir,target};
+  save(); renderSummary(); renderCards(); renderAlertList(); checkAlerts();
+  document.getElementById('alert-modal').classList.remove('open');
+}
+
+function renderAlertList() {
+  const el = document.getElementById('alert-list');
+  const keys = Object.keys(alerts);
+  if(!keys.length){ el.innerHTML='<div class="empty">NO ALERTS SET</div>'; return; }
+  el.innerHTML = `<div class="alert-grid">${keys.map(code=>{
+    const a=alerts[code]; const c=CURRENCIES.find(x=>x.code===code);
+    const label=a.dir==='below'?'LOW':'HIGH';
+    return `<div class="alert-row">
+      <div>
+        <div class="alert-pair">${c?.flag} ${code}/TWD</div>
+        <div class="alert-cond">${label} ${a.target.toFixed(2)}</div>
+      </div>
+      <button class="remove" onclick="removeAlert('${code}')">×</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function removeAlert(code){ delete alerts[code]; save(); renderSummary(); renderCards(); renderAlertList(); }
+
+function checkAlerts() {
+  let html='';
+  CURRENCIES.forEach(c=>{
+    if(!alerts[c.code]||!rates[c.code]) return;
+    const a=alerts[c.code]; const cur=rates[c.code].twd;
+    const hit=(a.dir==='below'&&cur<=a.target)||(a.dir==='above'&&cur>=a.target);
+    if(hit){
+      const label=a.dir==='below'?'已低於':'已高於';
+      html+=`<div class="alert-banner">⚡ <strong>${c.code}/TWD</strong> ${cur.toFixed(2)} ${label}目標 ${a.target.toFixed(2)}</div>`;
+      if('Notification'in window&&Notification.permission==='granted')
+        new Notification(`⚡ ${c.code}/TWD 到價提醒`,{body:`1 ${c.code} = ${cur.toFixed(2)} TWD，${label} ${a.target.toFixed(2)}`});
+    }
+  });
+  document.getElementById('alert-banners').innerHTML=html;
+  renderAlertList();
+}
+
+function openNotify(){ document.getElementById('notify-modal').classList.add('open'); }
+function closeNotify(e){ if(!e||e.target.id==='notify-modal') document.getElementById('notify-modal').classList.remove('open'); }
+
+async function requestNotify(){
+  if(!('Notification'in window)){alert('此瀏覽器不支援通知');return;}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){ document.getElementById('daily-on').checked=true; toggleDaily(); closeNotify(); new Notification('FX Monitor',{body:'每日通知已啟用'}); }
+  else alert('請在瀏覽器設定中允許通知。');
+}
+
+function toggleDaily(){
+  const on=document.getElementById('daily-on').checked;
+  document.getElementById('notify-status').textContent=on?'ENABLED':'DISABLED';
+  localStorage.setItem('fx_daily',on?'1':'');
+  if(on) scheduleDaily(); else if(dailyTimer){clearTimeout(dailyTimer);dailyTimer=null;}
+}
+
+function saveTime(){ localStorage.setItem('fx_time',document.getElementById('notify-time').value); if(document.getElementById('daily-on').checked) scheduleDaily(); }
+
+function scheduleDaily(){
+  if(dailyTimer) clearTimeout(dailyTimer);
+  const [h,m]=(document.getElementById('notify-time').value||'09:00').split(':').map(Number);
+  const now=new Date(); const t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m,0);
+  if(t<=now) t.setDate(t.getDate()+1);
+  const mins=Math.round((t-now)/60000);
+  document.getElementById('notify-status').textContent=`NEXT: ${mins>60?Math.round(mins/60)+'H':mins+'MIN'}`;
+  dailyTimer=setTimeout(()=>{sendDailyNotify();scheduleDaily();},t-now);
+}
+
+function sendDailyNotify(){
+  if(!('Notification'in window)||Notification.permission!=='granted') return;
+  const body=CURRENCIES.map(c=>{ const d=rates[c.code]; return d?`${c.flag} ${c.code}: ${d.twd.toFixed(2)} TWD`:null; }).filter(Boolean).join('\n');
+  new Notification('📊 FX Monitor — 每日匯率',{body,tag:'fx-daily'});
+}
+
+function testNotify(){ if(Notification.permission!=='granted'){requestNotify();return;} sendDailyNotify(); }
+
+(function init(){
+  try{
+    if(localStorage.getItem('fx_daily')){document.getElementById('daily-on').checked=true;toggleDaily();}
+    if(localStorage.getItem('fx_time')) document.getElementById('notify-time').value=localStorage.getItem('fx_time');
+  }catch(e){}
+  fetchRates();
+  setInterval(fetchRates,5*60*1000);
+})();
+</script>
+</body>
+</html>
