@@ -353,58 +353,63 @@ async function fetchHistory() {
   const btn = document.getElementById('hist-btn');
   btn.textContent = '載入中...';
   btn.disabled = true;
+  const OXR_KEY = '220d05c5fd4146fdb8e02f884982653f';
   try {
-    const today = new Date().toISOString().slice(0,10);
-    const from = new Date();
-    from.setFullYear(from.getFullYear() - 3);
-    const fromStr = from.toISOString().slice(0,10);
-
-    // Step 1: Get USD/TWD history (TWD not in Frankfurter, use USD as bridge)
-    const codesNoUSD = CURRENCIES.filter(c => c.code !== 'USD').map(c => c.code).join(',');
-    const [resUSD, resCross] = await Promise.all([
-      fetch(`https://api.frankfurter.app/${fromStr}..${today}?from=USD&to=TWD`),
-      fetch(`https://api.frankfurter.app/${fromStr}..${today}?from=USD&to=${codesNoUSD}`)
-    ]);
-    if (!resUSD.ok || !resCross.ok) throw new Error('API error');
-    const [dataUSD, dataCross] = await Promise.all([resUSD.json(), resCross.json()]);
-    if (!dataUSD.rates || !dataCross.rates) throw new Error('No rates');
-
-    // Step 2: For each date, calculate TWD rate for each currency
-    // USD->TWD rate: dataUSD.rates[date].TWD
-    // USD->XXX rate: dataCross.rates[date].XXX
-    // TWD->XXX = (USD->XXX) / (USD->TWD)
-    Object.entries(dataUSD.rates).forEach(([dateStr, usdDay]) => {
-      const twdPerUsd = usdDay['TWD'];
-      if (!twdPerUsd) return;
-      const crossDay = dataCross.rates[dateStr] || {};
-
-      CURRENCIES.forEach(c => {
-        if (!trend[c.code]) trend[c.code] = [];
-        const arr = trend[c.code];
-        if (arr.some(x => x.d === dateStr)) return;
-
-        let val;
-        if (c.code === 'USD') {
-          val = parseFloat(twdPerUsd.toFixed(4));
-        } else {
-          const usdToXxx = crossDay[c.code];
-          if (!usdToXxx) return;
-          val = parseFloat((usdToXxx / twdPerUsd * 1).toFixed(4));
-        }
-        arr.push({ d: dateStr, v: val });
-      });
+    const today = new Date();
+    let fetched = 0;
+    const dates = [];
+    for (let i = 12; i >= 1; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      dates.push(d.toISOString().slice(0,10));
+    }
+    const todo = dates.filter(dateStr => {
+      const ym = dateStr.slice(0,7);
+      return !CURRENCIES.every(c =>
+        trend[c.code] && trend[c.code].some(x => x.d.slice(0,7) === ym)
+      );
     });
-
+    btn.textContent = `載入中 0/${todo.length}...`;
+    for (const dateStr of todo) {
+      try {
+        // OXR historical: base is USD, free plan only
+        const res = await fetch(
+          `https://openexchangerates.org/api/historical/${dateStr}.json?app_id=${OXR_KEY}&symbols=TWD,MYR,EUR,CNY,AUD,SGD`
+        );
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (!data.rates || !data.rates.TWD) continue;
+        const twdPerUsd = data.rates.TWD;
+        CURRENCIES.forEach(c => {
+          if (!trend[c.code]) trend[c.code] = [];
+          const arr = trend[c.code];
+          if (arr.some(x => x.d === dateStr)) return;
+          let val;
+          if (c.code === 'USD') {
+            val = parseFloat(twdPerUsd.toFixed(4));
+          } else {
+            const cPerUsd = data.rates[c.code];
+            if (!cPerUsd) return;
+            // 1 TWD = cPerUsd / twdPerUsd foreign currency
+            // 1 foreign = twdPerUsd / cPerUsd TWD
+            val = parseFloat((twdPerUsd / cPerUsd).toFixed(4));
+          }
+          arr.push({ d: dateStr, v: val });
+        });
+        fetched++;
+        btn.textContent = `載入中 ${fetched}/${todo.length}...`;
+      } catch(e) { continue; }
+      await new Promise(r => setTimeout(r, 300));
+    }
     CURRENCIES.forEach(c => {
       if (trend[c.code]) trend[c.code].sort((a,b) => a.d.localeCompare(b.d));
     });
     save();
     renderChart();
-    btn.textContent = '✓ 已載入';
-    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2500);
+    btn.textContent = fetched > 0 ? `✓ 已載入 ${fetched} 筆` : '✓ 已是最新';
+    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 3000);
   } catch(e) {
     console.error(e);
-    btn.textContent = '載入失敗，請重試';
+    btn.textContent = '載入失敗';
     setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2500);
   }
 }
