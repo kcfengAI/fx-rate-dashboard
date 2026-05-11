@@ -354,38 +354,39 @@ async function fetchHistory() {
   btn.textContent = '載入中...';
   btn.disabled = true;
   try {
-    const today = new Date();
-    for (let monthsAgo = 36; monthsAgo >= 1; monthsAgo--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
-      const dateStr = d.toISOString().slice(0,10);
-      const alreadyHave = CURRENCIES.every(c =>
-        trend[c.code] && trend[c.code].some(x => x.d.slice(0,7) === dateStr.slice(0,7))
-      );
-      if (alreadyHave) continue;
-      const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/history/TWD/${dateStr}`);
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.result !== 'success') continue;
+    const today = new Date().toISOString().slice(0,10);
+    const from = new Date();
+    from.setFullYear(from.getFullYear() - 3);
+    const fromStr = from.toISOString().slice(0,10);
+    const codes = CURRENCIES.map(c => c.code).join(',');
+    // Frankfurter: free, no key needed, supports TWD, returns daily data
+    const res = await fetch(`https://api.frankfurter.app/${fromStr}..${today}?from=TWD&to=${codes}`);
+    if (!res.ok) throw new Error('Frankfurter API error');
+    const data = await res.json();
+    if (!data.rates) throw new Error('No rates');
+    Object.entries(data.rates).forEach(([dateStr, dayRates]) => {
       CURRENCIES.forEach(c => {
         if (!trend[c.code]) trend[c.code] = [];
-        const r = data.conversion_rates?.[c.code];
+        const r = dayRates[c.code];
         if (!r) return;
         const val = parseFloat((1/r).toFixed(4));
         const arr = trend[c.code];
         if (!arr.some(x => x.d === dateStr)) {
           arr.push({ d: dateStr, v: val });
-          arr.sort((a,b) => a.d.localeCompare(b.d));
         }
       });
-      await new Promise(r => setTimeout(r, 350));
-    }
+    });
+    CURRENCIES.forEach(c => {
+      if (trend[c.code]) trend[c.code].sort((a,b) => a.d.localeCompare(b.d));
+    });
     save();
     renderChart();
     btn.textContent = '✓ 已載入';
     setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2500);
   } catch(e) {
-    btn.textContent = '↓ 載入歷史';
-    btn.disabled = false;
+    console.error(e);
+    btn.textContent = '載入失敗，請重試';
+    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2500);
   }
 }
 
