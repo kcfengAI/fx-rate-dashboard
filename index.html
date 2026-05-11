@@ -39,26 +39,20 @@
 }
 html { font-size: 16px; }
 body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
-
-/* ── Layout ── */
 .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 40px; }
-
-/* ── Header ── */
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .brand-name { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
 .brand-sub { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: var(--mono); }
 .header-right { display: flex; align-items: center; gap: 8px; }
 .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--mono); color: var(--green); background: var(--green-dim); padding: 5px 10px; border-radius: 20px; border: 1px solid rgba(34,197,94,0.2); }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12px; font-weight: 500; font-family: var(--sans); border: 1px solid var(--border2); border-radius: var(--radius); background: var(--panel); color: var(--text2); cursor: pointer; transition: all .15s; letter-spacing: 0.01em; }
-.btn:hover { border-color: var(--border2); color: var(--text); background: var(--panel2); }
-.btn-accent { background: var(--blue); color: #fff; border-color: var(--blue); }
-.btn-accent:hover { opacity: .85; color: #fff; }
-
-/* ── Summary bar ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; font-size: 12px; font-weight: 500; font-family: var(--sans); border: 1px solid var(--border2); border-radius: var(--radius); background: var(--panel); color: var(--text2); cursor: pointer; transition: all .15s; }
+.btn:hover { color: var(--text); background: var(--panel2); }
+.btn-accent { background: var(--amber); color: #000; border-color: var(--amber); font-weight: 600; }
+.btn-accent:hover { opacity: .85; color: #000; }
 .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
 .summary-cell { background: var(--panel); padding: 14px 16px; }
 .summary-label { font-size: 10px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
@@ -66,8 +60,6 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .summary-val.up { color: var(--green); }
 .summary-val.down { color: var(--red); }
 .summary-sub { font-size: 10px; color: var(--text2); margin-top: 3px; font-family: var(--mono); }
-
-/* ── Rate cards ── */
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
 @media(max-width:540px){ .cards { grid-template-columns: repeat(2,1fr); } }
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: border-color .15s, background .15s; position: relative; overflow: hidden; }
@@ -76,11 +68,10 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .card:hover::before { opacity:1; }
 .card.up-card::before { background: linear-gradient(135deg, var(--green-dim) 0%, transparent 60%); }
 .card.down-card::before { background: linear-gradient(135deg, var(--red-dim) 0%, transparent 60%); }
-.card.active { border-color: var(--blue) !important; }
+.card.active { border-color: var(--amber) !important; }
 .card.alert-on { border-color: var(--amber); }
 .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .card-pair { font-size: 10px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; }
-.card-alert-icon { font-size: 12px; opacity:.7; }
 .card-rate { font-size: 26px; font-weight: 600; font-family: var(--mono); line-height: 1; margin-bottom: 4px; }
 .card-base { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
 .card-footer { display: flex; align-items: center; justify-content: space-between; }
@@ -88,11 +79,9 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .card-change { font-size: 11px; font-family: var(--mono); font-weight: 500; padding: 2px 7px; border-radius: 4px; }
 .card-change.up { color: var(--green); background: var(--green-dim); }
 .card-change.down { color: var(--red); background: var(--red-dim); }
-.card-change.flat { color: var(--text3); background: transparent; }
+.card-change.flat { color: var(--text3); }
 .shimmer { background: linear-gradient(90deg, var(--panel2) 0%, var(--border2) 50%, var(--panel2) 100%); background-size: 200%; animation: sh 1.4s infinite; border-radius: 4px; display: inline-block; }
 @keyframes sh { 0%{background-position:200%}100%{background-position:-200%} }
-
-/* ── Chart section ── */
 .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 16px; }
 .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 .panel-title { font-size: 12px; font-weight: 600; font-family: var(--mono); color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
@@ -100,20 +89,19 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .tab { font-size: 11px; font-family: var(--mono); padding: 4px 9px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
 .tab:hover { color: var(--text2); border-color: var(--border2); }
 .tab.active { background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,.3); }
+.period-btn { font-size: 11px; font-family: var(--mono); padding: 4px 9px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
+.period-btn:hover { color: var(--text2); border-color: var(--border2); }
+.period-btn.active { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,158,11,.35); }
 .chart-wrap { position: relative; height: 200px; }
 .chart-meta { font-size: 10px; font-family: var(--mono); color: var(--text3); text-align: right; margin-top: 8px; }
-
-/* ── Alerts ── */
 .alert-banner { background: var(--amber-dim); border: 1px solid rgba(245,158,11,.25); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--amber); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .alert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; }
 .alert-row { background: var(--panel2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
-.alert-pair { font-size: 12px; font-family: var(--mono); font-weight: 500; color: var(--text); }
+.alert-pair { font-size: 12px; font-family: var(--mono); font-weight: 500; }
 .alert-cond { font-size: 10px; color: var(--text2); margin-top: 3px; font-family: var(--mono); }
 .remove { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; padding: 2px 6px; border-radius: 4px; line-height:1; }
 .remove:hover { color: var(--red); }
 .empty { font-size: 12px; font-family: var(--mono); color: var(--text3); text-align: center; padding: 16px 0; }
-
-/* ── Notify toggles ── */
 .notify-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
 .notify-item:last-child { border-bottom: none; padding-bottom: 0; }
 .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
@@ -123,8 +111,6 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .toggle input:checked + .tslider { background: var(--green-dim); border-color: rgba(34,197,94,.3); }
 .toggle input:checked + .tslider::before { transform:translateX(16px); background:var(--green); }
 input[type=time] { padding:5px 9px; font-size:12px; font-family:var(--mono); border:1px solid var(--border2); border-radius:var(--radius); background:var(--panel2); color:var(--text); }
-
-/* ── Modal ── */
 .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
 .modal-bg.open { display:flex; }
 .modal { background:var(--panel); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:20px; width:100%; max-width:300px; }
@@ -133,23 +119,14 @@ input[type=time] { padding:5px 9px; font-size:12px; font-family:var(--mono); bor
 .modal select, .modal input[type=number] { width:100%; padding:8px 10px; font-size:13px; font-family:var(--mono); border:1px solid var(--border2); border-radius:var(--radius); background:var(--panel2); color:var(--text); }
 .modal-actions { display:flex; gap:8px; margin-top:16px; }
 .modal-actions .btn { flex:1; justify-content:center; font-size:12px; }
-
-
-/* ── Period buttons ── */
-.period-btn { font-size:11px; font-family:var(--mono); padding:4px 9px; border-radius:5px; border:1px solid var(--border); background:transparent; color:var(--text3); cursor:pointer; transition:all .15s; }
-.period-btn:hover { color:var(--text2); border-color:var(--border2); }
-.period-btn.active { background:rgba(245,158,11,0.15); color:#f59e0b; border-color:rgba(245,158,11,0.35); }
-
-/* ── Footer ── */
 footer { text-align:center; font-size:10px; font-family:var(--mono); color:var(--text3); padding-top:24px; letter-spacing:.04em; }
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="header">
     <div class="brand">
-      <div class="brand-logo">📊</div>
+      <div class="brand-logo">$</div>
       <div>
         <div class="brand-name">FX MONITOR</div>
         <div class="brand-sub" id="last-update">LOADING...</div>
@@ -179,15 +156,15 @@ footer { text-align:center; font-size:10px; font-family:var(--mono); color:var(-
       <div class="tabs" id="tabs"></div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
-      <span style="font-size:10px;font-family:var(--mono);color:var(--text3);margin-right:4px;">期間</span>
-      <button class="period-btn active" onclick="setPeriod(7)" id="p7">7D</button>
-      <button class="period-btn" onclick="setPeriod(30)" id="p30">1M</button>
-      <button class="period-btn" onclick="setPeriod(90)" id="p90">3M</button>
-      <button class="period-btn" onclick="setPeriod(180)" id="p180">6M</button>
-      <button class="period-btn" onclick="setPeriod(365)" id="p365">1Y</button>
-      <button class="period-btn" onclick="setPeriod(730)" id="p730">2Y</button>
-      <button class="period-btn" onclick="setPeriod(1095)" id="p1095">3Y</button>
-      <button class="btn" style="font-size:10px;padding:4px 9px;margin-left:6px;" onclick="fetchHistory()" id="fetch-hist-btn">↓ 載入歷史</button>
+      <span style="font-size:10px;font-family:var(--mono);color:var(--text3);margin-right:2px;">期間</span>
+      <button class="period-btn active" id="p7"   onclick="setPeriod(7)">7D</button>
+      <button class="period-btn"        id="p30"  onclick="setPeriod(30)">1M</button>
+      <button class="period-btn"        id="p90"  onclick="setPeriod(90)">3M</button>
+      <button class="period-btn"        id="p180" onclick="setPeriod(180)">6M</button>
+      <button class="period-btn"        id="p365" onclick="setPeriod(365)">1Y</button>
+      <button class="period-btn"        id="p730" onclick="setPeriod(730)">2Y</button>
+      <button class="period-btn"        id="p1095" onclick="setPeriod(1095)">3Y</button>
+      <button class="btn" id="hist-btn" style="font-size:10px;padding:4px 10px;margin-left:4px;" onclick="fetchHistory()">↓ 載入歷史</button>
     </div>
     <div class="chart-wrap"><canvas id="chart" role="img" aria-label="匯率走勢折線圖"></canvas></div>
     <div class="chart-meta" id="chart-meta"></div>
@@ -217,7 +194,6 @@ footer { text-align:center; font-size:10px; font-family:var(--mono); color:var(-
   <footer>FX MONITOR · TWD EXCHANGE RATES · AUTO-REFRESH 5MIN · DATA: EXCHANGERATE-API</footer>
 </div>
 
-<!-- Alert modal -->
 <div class="modal-bg" id="alert-modal" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3 id="modal-title">SET ALERT</h3>
@@ -235,7 +211,6 @@ footer { text-align:center; font-size:10px; font-family:var(--mono); color:var(-
   </div>
 </div>
 
-<!-- Notify modal -->
 <div class="modal-bg" id="notify-modal" onclick="closeNotify(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>ENABLE NOTIFICATIONS</h3>
@@ -257,12 +232,13 @@ const CURRENCIES = [
   { code:'SGD', name:'新加坡幣', flag:'🇸🇬' },
 ];
 
-const API_KEY = 'YOUR_EXCHANGE_API_KEY'; // ← 填入你的 ExchangeRate-API 金鑰
+const API_KEY = 'YOUR_EXCHANGE_API_KEY';
 
 let rates = {}, prevRates = {};
-let trend = JSON.parse(localStorage.getItem('fx_trend')||'{}');
-let alerts = JSON.parse(localStorage.getItem('fx_alerts')||'{}');
+let trend = JSON.parse(localStorage.getItem('fx_trend') || '{}');
+let alerts = JSON.parse(localStorage.getItem('fx_alerts') || '{}');
 let activeCode = 'USD';
+let activePeriod = 7;
 let chart = null, dailyTimer = null, currentCode = null;
 
 function save() {
@@ -304,7 +280,7 @@ function recordTrend() {
     const last = arr[arr.length-1];
     if (last && last.d === today) last.v = rates[c.code]?.twd;
     else if (rates[c.code]) arr.push({ d: today, v: rates[c.code].twd });
-    if (arr.length > 60) arr.splice(0, arr.length-60);
+    if (arr.length > 1100) arr.splice(0, arr.length - 1100);
   });
   save();
 }
@@ -316,35 +292,16 @@ function renderAll() {
 function renderSummary() {
   const usd = rates['USD']?.twd;
   const changes = CURRENCIES.map(c => {
-    const cur = rates[c.code]?.twd;
-    const prev = prevRates[c.code]?.twd;
+    const cur = rates[c.code]?.twd, prev = prevRates[c.code]?.twd;
     return { code: c.code, chg: (prev && cur) ? ((cur-prev)/prev*100) : 0 };
   }).filter(x => x.chg !== 0);
-  const best = changes.sort((a,b)=>b.chg-a.chg)[0];
-  const worst = [...changes].sort((a,b)=>a.chg-b.chg)[0];
-  const alertCount = Object.keys(alerts).length;
-
+  const best = [...changes].sort((a,b) => b.chg - a.chg)[0];
+  const worst = [...changes].sort((a,b) => a.chg - b.chg)[0];
   document.getElementById('summary-bar').innerHTML = `
-    <div class="summary-cell">
-      <div class="summary-label">USD / TWD</div>
-      <div class="summary-val">${usd ? usd.toFixed(2) : '—'}</div>
-      <div class="summary-sub">台幣兌美元</div>
-    </div>
-    <div class="summary-cell">
-      <div class="summary-label">今日最強外幣</div>
-      <div class="summary-val up">${best ? best.code : '—'}</div>
-      <div class="summary-sub">${best ? (best.chg>0?'+':'')+best.chg.toFixed(2)+'%' : ''}</div>
-    </div>
-    <div class="summary-cell">
-      <div class="summary-label">今日最弱外幣</div>
-      <div class="summary-val down">${worst ? worst.code : '—'}</div>
-      <div class="summary-sub">${worst ? worst.chg.toFixed(2)+'%' : ''}</div>
-    </div>
-    <div class="summary-cell">
-      <div class="summary-label">到價提醒</div>
-      <div class="summary-val" style="color:var(--amber)">${alertCount}</div>
-      <div class="summary-sub">監控中</div>
-    </div>`;
+    <div class="summary-cell"><div class="summary-label">USD / TWD</div><div class="summary-val">${usd ? usd.toFixed(2) : '—'}</div><div class="summary-sub">台幣兌美元</div></div>
+    <div class="summary-cell"><div class="summary-label">今日最強外幣</div><div class="summary-val up">${best ? best.code : '—'}</div><div class="summary-sub">${best && best.chg ? (best.chg>0?'+':'')+best.chg.toFixed(2)+'%' : ''}</div></div>
+    <div class="summary-cell"><div class="summary-label">今日最弱外幣</div><div class="summary-val down">${worst ? worst.code : '—'}</div><div class="summary-sub">${worst && worst.chg ? worst.chg.toFixed(2)+'%' : ''}</div></div>
+    <div class="summary-cell"><div class="summary-label">到價提醒</div><div class="summary-val" style="color:var(--amber)">${Object.keys(alerts).length}</div><div class="summary-sub">監控中</div></div>`;
 }
 
 function renderCards() {
@@ -356,16 +313,10 @@ function renderCards() {
     const dir = chgPct > 0.005 ? 'up' : chgPct < -0.005 ? 'down' : 'flat';
     const arrow = dir==='up'?'▲':dir==='down'?'▼':'—';
     return `<div class="card ${dir}-card${activeCode===c.code?' active':''}${alerts[c.code]?' alert-on':''}" onclick="selectCard('${c.code}')">
-      <div class="card-header">
-        <span class="card-pair">${c.code} / TWD</span>
-        ${alerts[c.code]?'<span class="card-alert-icon">🔔</span>':''}
-      </div>
+      <div class="card-header"><span class="card-pair">${c.code} / TWD</span>${alerts[c.code]?'<span style="font-size:12px;">🔔</span>':''}</div>
       <div class="card-rate">${d.twd.toFixed(2)}</div>
       <div class="card-base">1 ${c.code} = ? TWD</div>
-      <div class="card-footer">
-        <span class="card-name">${c.flag} ${c.name}</span>
-        <span class="card-change ${dir}">${arrow} ${Math.abs(chgPct).toFixed(2)}%</span>
-      </div>
+      <div class="card-footer"><span class="card-name">${c.flag} ${c.name}</span><span class="card-change ${dir}">${arrow} ${Math.abs(chgPct).toFixed(2)}%</span></div>
     </div>`;
   }).join('');
 }
@@ -380,7 +331,7 @@ function switchTab(code) { activeCode = code; renderCards(); renderTabs(); rende
 
 function selectCard(code) {
   currentCode = code;
-  const c = CURRENCIES.find(x=>x.code===code);
+  const c = CURRENCIES.find(x => x.code===code);
   document.getElementById('modal-title').textContent = `ALERT — ${c.code} / TWD`;
   const a = alerts[code];
   document.getElementById('modal-dir').value = a?.dir || 'below';
@@ -389,25 +340,79 @@ function selectCard(code) {
   switchTab(code);
 }
 
+function setPeriod(days) {
+  activePeriod = days;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  const ids = {7:'p7',30:'p30',90:'p90',180:'p180',365:'p365',730:'p730',1095:'p1095'};
+  const el = document.getElementById(ids[days]);
+  if (el) el.classList.add('active');
+  renderChart();
+}
+
+async function fetchHistory() {
+  const btn = document.getElementById('hist-btn');
+  btn.textContent = '載入中...';
+  btn.disabled = true;
+  try {
+    const today = new Date();
+    for (let monthsAgo = 36; monthsAgo >= 1; monthsAgo--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
+      const dateStr = d.toISOString().slice(0,10);
+      const alreadyHave = CURRENCIES.every(c =>
+        trend[c.code] && trend[c.code].some(x => x.d.slice(0,7) === dateStr.slice(0,7))
+      );
+      if (alreadyHave) continue;
+      const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/history/TWD/${dateStr}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.result !== 'success') continue;
+      CURRENCIES.forEach(c => {
+        if (!trend[c.code]) trend[c.code] = [];
+        const r = data.conversion_rates?.[c.code];
+        if (!r) return;
+        const val = parseFloat((1/r).toFixed(4));
+        const arr = trend[c.code];
+        if (!arr.some(x => x.d === dateStr)) {
+          arr.push({ d: dateStr, v: val });
+          arr.sort((a,b) => a.d.localeCompare(b.d));
+        }
+      });
+      await new Promise(r => setTimeout(r, 350));
+    }
+    save();
+    renderChart();
+    btn.textContent = '✓ 已載入';
+    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2500);
+  } catch(e) {
+    btn.textContent = '↓ 載入歷史';
+    btn.disabled = false;
+  }
+}
+
 function renderChart() {
-  const allArr = trend[activeCode] || [];
-  const c = CURRENCIES.find(x=>x.code===activeCode);
+  const c = CURRENCIES.find(x => x.code===activeCode);
+  const allArr = (trend[activeCode] || []).slice();
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - activePeriod);
   const cutoffStr = cutoff.toISOString().slice(0,10);
-  const arr = allArr.filter(x => x.d >= cutoffStr);
-  let labels = arr.map(x=>x.d.slice(5));
-  let values = arr.map(x=>x.v);
+  let arr = allArr.filter(x => x.d >= cutoffStr);
+
+  let labels = arr.map(x => x.d.slice(5));
+  let values = arr.map(x => x.v);
+
   if (values.length < 2) {
     const base = rates[activeCode]?.twd || 31;
-    for (let i=13;i>=0;i--) {
+    labels = []; values = [];
+    for (let i=13; i>=0; i--) {
       const d = new Date(); d.setDate(d.getDate()-i);
       labels.push(d.toISOString().slice(5,10));
       values.push(parseFloat((base*(1+(Math.random()-.5)*.008)).toFixed(4)));
     }
   }
+
+  const periodLabel = {7:'7D',30:'1M',90:'3M',180:'6M',365:'1Y',730:'2Y',1095:'3Y'}[activePeriod] || '';
   document.getElementById('chart-meta').textContent =
-    `${c?.code} / TWD  ·  ${values.length}D  ·  HIGH ${Math.max(...values).toFixed(2)}  ·  LOW ${Math.min(...values).toFixed(2)}`;
+    `${c?.code} / TWD  ·  ${periodLabel}  ·  HIGH ${Math.max(...values).toFixed(2)}  ·  LOW ${Math.min(...values).toFixed(2)}`;
 
   if (chart) chart.destroy();
   const isUp = values[values.length-1] >= values[0];
@@ -415,37 +420,37 @@ function renderChart() {
   const fillColor = isUp ? 'rgba(34,197,94,0.07)' : 'rgba(239,68,68,0.07)';
 
   chart = new Chart(document.getElementById('chart'), {
-    type:'line',
-    data:{
+    type: 'line',
+    data: {
       labels,
-      datasets:[{
-        data: values,
-        borderColor: lineColor,
-        backgroundColor: fillColor,
-        fill: true, tension: 0.3,
-        pointRadius: values.length > 20 ? 0 : 3,
-        pointBackgroundColor: lineColor,
-        borderWidth: 1.5
-      }]
+      datasets: [{ data: values, borderColor: lineColor, backgroundColor: fillColor,
+        fill: true, tension: 0.3, pointRadius: values.length > 30 ? 0 : 3,
+        pointBackgroundColor: lineColor, borderWidth: 1.5 }]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`  ${ctx.parsed.y.toFixed(2)} TWD` }, backgroundColor:'#1a1a1a', borderColor:'rgba(255,255,255,.1)', borderWidth:1, titleColor:'#888', bodyColor:'#f0f0f0', titleFont:{family:'DM Mono, monospace',size:10}, bodyFont:{family:'DM Mono, monospace',size:12} } },
-      scales:{
-        x:{ grid:{color:'rgba(255,255,255,.08)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},maxTicksLimit:8} },
-        y:{ grid:{color:'rgba(255,255,255,.08)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},callback:v=>v.toFixed(2)}, position:'right' }
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{
+        callbacks:{ label: ctx => `  ${ctx.parsed.y.toFixed(2)} TWD` },
+        backgroundColor:'#1a1a1a', borderColor:'rgba(255,255,255,.1)', borderWidth:1,
+        titleColor:'#aaa', bodyColor:'#f0f0f0',
+        titleFont:{family:'DM Mono, monospace',size:10}, bodyFont:{family:'DM Mono, monospace',size:12}
+      }},
+      scales: {
+        x: { grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},maxTicksLimit:8} },
+        y: { grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#aaa',font:{family:'DM Mono, monospace',size:10},callback:v=>v.toFixed(2)}, position:'right' }
       }
     }
   });
 }
 
 function closeModal(e) { if(!e||e.target.id==='alert-modal') document.getElementById('alert-modal').classList.remove('open'); }
+
 function saveAlert() {
   if(!currentCode) return;
   const dir = document.getElementById('modal-dir').value;
   const target = parseFloat(document.getElementById('modal-target').value);
   if(isNaN(target)) return;
-  alerts[currentCode]={dir,target};
+  alerts[currentCode] = {dir, target};
   save(); renderSummary(); renderCards(); renderAlertList(); checkAlerts();
   document.getElementById('alert-modal').classList.remove('open');
 }
@@ -453,195 +458,82 @@ function saveAlert() {
 function renderAlertList() {
   const el = document.getElementById('alert-list');
   const keys = Object.keys(alerts);
-  if(!keys.length){ el.innerHTML='<div class="empty">NO ALERTS SET</div>'; return; }
-  el.innerHTML = `<div class="alert-grid">${keys.map(code=>{
-    const a=alerts[code]; const c=CURRENCIES.find(x=>x.code===code);
-    const label=a.dir==='below'?'LOW':'HIGH';
+  if(!keys.length) { el.innerHTML='<div class="empty">NO ALERTS SET</div>'; return; }
+  el.innerHTML = `<div class="alert-grid">${keys.map(code => {
+    const a = alerts[code], c = CURRENCIES.find(x=>x.code===code);
     return `<div class="alert-row">
-      <div>
-        <div class="alert-pair">${c?.flag} ${code}/TWD</div>
-        <div class="alert-cond">${label} ${a.target.toFixed(2)}</div>
-      </div>
+      <div><div class="alert-pair">${c?.flag} ${code}/TWD</div><div class="alert-cond">${a.dir==='below'?'LOW':'HIGH'} ${a.target.toFixed(2)}</div></div>
       <button class="remove" onclick="removeAlert('${code}')">×</button>
     </div>`;
   }).join('')}</div>`;
 }
 
-function removeAlert(code){ delete alerts[code]; save(); renderSummary(); renderCards(); renderAlertList(); }
+function removeAlert(code) { delete alerts[code]; save(); renderSummary(); renderCards(); renderAlertList(); }
 
 function checkAlerts() {
-  let html='';
-  CURRENCIES.forEach(c=>{
+  let html = '';
+  CURRENCIES.forEach(c => {
     if(!alerts[c.code]||!rates[c.code]) return;
-    const a=alerts[c.code]; const cur=rates[c.code].twd;
-    const hit=(a.dir==='below'&&cur<=a.target)||(a.dir==='above'&&cur>=a.target);
-    if(hit){
-      const label=a.dir==='below'?'已低於':'已高於';
-      html+=`<div class="alert-banner">⚡ <strong>${c.code}/TWD</strong> ${cur.toFixed(2)} ${label}目標 ${a.target.toFixed(2)}</div>`;
+    const a = alerts[c.code], cur = rates[c.code].twd;
+    const hit = (a.dir==='below'&&cur<=a.target)||(a.dir==='above'&&cur>=a.target);
+    if(hit) {
+      html += `<div class="alert-banner">⚡ <strong>${c.code}/TWD</strong> ${cur.toFixed(2)} ${a.dir==='below'?'已低於':'已高於'}目標 ${a.target.toFixed(2)}</div>`;
       if('Notification'in window&&Notification.permission==='granted')
-        new Notification(`⚡ ${c.code}/TWD 到價提醒`,{body:`1 ${c.code} = ${cur.toFixed(2)} TWD，${label} ${a.target.toFixed(2)}`});
+        new Notification(`⚡ ${c.code}/TWD 到價`,{body:`1 ${c.code} = ${cur.toFixed(2)} TWD`});
     }
   });
-  document.getElementById('alert-banners').innerHTML=html;
+  document.getElementById('alert-banners').innerHTML = html;
   renderAlertList();
 }
 
-function openNotify(){ document.getElementById('notify-modal').classList.add('open'); }
-function closeNotify(e){ if(!e||e.target.id==='notify-modal') document.getElementById('notify-modal').classList.remove('open'); }
+function openNotify() { document.getElementById('notify-modal').classList.add('open'); }
+function closeNotify(e) { if(!e||e.target.id==='notify-modal') document.getElementById('notify-modal').classList.remove('open'); }
 
-async function requestNotify(){
+async function requestNotify() {
   if(!('Notification'in window)){alert('此瀏覽器不支援通知');return;}
-  const p=await Notification.requestPermission();
+  const p = await Notification.requestPermission();
   if(p==='granted'){ document.getElementById('daily-on').checked=true; toggleDaily(); closeNotify(); new Notification('FX Monitor',{body:'每日通知已啟用'}); }
   else alert('請在瀏覽器設定中允許通知。');
 }
 
-function toggleDaily(){
-  const on=document.getElementById('daily-on').checked;
-  document.getElementById('notify-status').textContent=on?'ENABLED':'DISABLED';
-  localStorage.setItem('fx_daily',on?'1':'');
+function toggleDaily() {
+  const on = document.getElementById('daily-on').checked;
+  document.getElementById('notify-status').textContent = on ? 'ENABLED' : 'DISABLED';
+  localStorage.setItem('fx_daily', on ? '1' : '');
   if(on) scheduleDaily(); else if(dailyTimer){clearTimeout(dailyTimer);dailyTimer=null;}
 }
 
-function saveTime(){ localStorage.setItem('fx_time',document.getElementById('notify-time').value); if(document.getElementById('daily-on').checked) scheduleDaily(); }
-
-function scheduleDaily(){
-  if(dailyTimer) clearTimeout(dailyTimer);
-  const [h,m]=(document.getElementById('notify-time').value||'09:00').split(':').map(Number);
-  const now=new Date(); const t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m,0);
-  if(t<=now) t.setDate(t.getDate()+1);
-  const mins=Math.round((t-now)/60000);
-  document.getElementById('notify-status').textContent=`NEXT: ${mins>60?Math.round(mins/60)+'H':mins+'MIN'}`;
-  dailyTimer=setTimeout(()=>{sendDailyNotify();scheduleDaily();},t-now);
+function saveTime() {
+  localStorage.setItem('fx_time', document.getElementById('notify-time').value);
+  if(document.getElementById('daily-on').checked) scheduleDaily();
 }
 
-function sendDailyNotify(){
+function scheduleDaily() {
+  if(dailyTimer) clearTimeout(dailyTimer);
+  const [h,m] = (document.getElementById('notify-time').value||'09:00').split(':').map(Number);
+  const now = new Date();
+  const t = new Date(now.getFullYear(),now.getMonth(),now.getDate(),h,m,0);
+  if(t<=now) t.setDate(t.getDate()+1);
+  const mins = Math.round((t-now)/60000);
+  document.getElementById('notify-status').textContent = `NEXT: ${mins>60?Math.round(mins/60)+'H':mins+'MIN'}`;
+  dailyTimer = setTimeout(()=>{sendDailyNotify();scheduleDaily();}, t-now);
+}
+
+function sendDailyNotify() {
   if(!('Notification'in window)||Notification.permission!=='granted') return;
-  const body=CURRENCIES.map(c=>{ const d=rates[c.code]; return d?`${c.flag} ${c.code}: ${d.twd.toFixed(2)} TWD`:null; }).filter(Boolean).join('\n');
+  const body = CURRENCIES.map(c=>{ const d=rates[c.code]; return d?`${c.flag} ${c.code}: ${d.twd.toFixed(2)} TWD`:null; }).filter(Boolean).join('\n');
   new Notification('📊 FX Monitor — 每日匯率',{body,tag:'fx-daily'});
 }
 
-function testNotify(){ if(Notification.permission!=='granted'){requestNotify();return;} sendDailyNotify(); }
+function testNotify() { if(Notification.permission!=='granted'){requestNotify();return;} sendDailyNotify(); }
 
-(function init(){
-  try{
-    if(localStorage.getItem('fx_daily')){document.getElementById('daily-on').checked=true;toggleDaily();}
-    if(localStorage.getItem('fx_time')) document.getElementById('notify-time').value=localStorage.getItem('fx_time');
-  }catch(e){}
-
-// ── Period selection ──────────────────────────────
-let activePeriod = 7;
-
-function setPeriod(days) {
-  activePeriod = days;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  const idMap = {7:'p7',30:'p30',90:'p90',180:'p180',365:'p365',730:'p730',1095:'p1095'};
-  const el = document.getElementById(idMap[days]);
-  if (el) el.classList.add('active');
-  renderChart();
-}
-
-async function fetchHistory() {
-  const btn = document.getElementById('fetch-hist-btn');
-  btn.textContent = '載入中...';
-  btn.disabled = true;
+(function init() {
   try {
-    const today = new Date();
-    const requests = [];
-    // Fetch up to 3 years of monthly data using time-series endpoint
-    for (let monthsAgo = 35; monthsAgo >= 1; monthsAgo--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
-      const dateStr = d.toISOString().slice(0,10);
-      requests.push(dateStr);
-    }
-    // Batch: fetch one per month (free plan supports history)
-    for (const dateStr of requests) {
-      const existing = Object.values(trend).some(arr => arr.some(x => x.d === dateStr));
-      if (existing) continue;
-      const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/history/TWD/${dateStr}`);
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.result !== 'success') continue;
-      CURRENCIES.forEach(c => {
-        if (!trend[c.code]) trend[c.code] = [];
-        const r = data.conversion_rates?.[c.code];
-        if (!r) return;
-        const val = parseFloat((1/r).toFixed(4));
-        const arr = trend[c.code];
-        if (!arr.some(x => x.d === dateStr)) {
-          arr.push({ d: dateStr, v: val });
-          arr.sort((a,b) => a.d.localeCompare(b.d));
-        }
-      });
-      await new Promise(r => setTimeout(r, 300)); // rate limit
-    }
-    save();
-    renderChart();
-    btn.textContent = '✓ 已載入';
-    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2000);
-  } catch(e) {
-    btn.textContent = '↓ 載入歷史';
-    btn.disabled = false;
-  }
-}
-
-
-// ── Period selection ──────────────────────────────
-let activePeriod = 7;
-
-function setPeriod(days) {
-  activePeriod = days;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  const idMap = {7:'p7',30:'p30',90:'p90',180:'p180',365:'p365',730:'p730',1095:'p1095'};
-  const el = document.getElementById(idMap[days]);
-  if (el) el.classList.add('active');
-  renderChart();
-}
-
-async function fetchHistory() {
-  const btn = document.getElementById('fetch-hist-btn');
-  btn.textContent = '載入中...';
-  btn.disabled = true;
-  try {
-    const today = new Date();
-    const requests = [];
-    for (let monthsAgo = 35; monthsAgo >= 1; monthsAgo--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
-      const dateStr = d.toISOString().slice(0,10);
-      requests.push(dateStr);
-    }
-    for (const dateStr of requests) {
-      const existing = Object.values(trend).some(arr => arr.some(x => x.d === dateStr));
-      if (existing) continue;
-      const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/history/TWD/${dateStr}`);
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.result !== 'success') continue;
-      CURRENCIES.forEach(c => {
-        if (!trend[c.code]) trend[c.code] = [];
-        const r = data.conversion_rates?.[c.code];
-        if (!r) return;
-        const val = parseFloat((1/r).toFixed(4));
-        const arr = trend[c.code];
-        if (!arr.some(x => x.d === dateStr)) {
-          arr.push({ d: dateStr, v: val });
-          arr.sort((a,b) => a.d.localeCompare(b.d));
-        }
-      });
-      await new Promise(r => setTimeout(r, 300));
-    }
-    save();
-    renderChart();
-    btn.textContent = '✓ 已載入';
-    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2000);
-  } catch(e) {
-    btn.textContent = '↓ 載入歷史';
-    btn.disabled = false;
-  }
-}
-
+    if(localStorage.getItem('fx_daily')){ document.getElementById('daily-on').checked=true; toggleDaily(); }
+    if(localStorage.getItem('fx_time')) document.getElementById('notify-time').value = localStorage.getItem('fx_time');
+  } catch(e) {}
   fetchRates();
-  setInterval(fetchRates,5*60*1000);
+  setInterval(fetchRates, 5*60*1000);
 })();
 </script>
 <script>
