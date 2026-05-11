@@ -232,7 +232,7 @@ const CURRENCIES = [
   { code:'SGD', name:'新加坡幣', flag:'🇸🇬' },
 ];
 
-const API_KEY = '6b9f7829796cc631c2331a7a';
+const API_KEY = 'YOUR_EXCHANGE_API_KEY';
 
 let rates = {}, prevRates = {};
 let trend = JSON.parse(localStorage.getItem('fx_trend') || '{}');
@@ -356,22 +356,28 @@ async function fetchHistory() {
   const OXR_KEY = '220d05c5fd4146fdb8e02f884982653f';
   try {
     const today = new Date();
-    let fetched = 0;
+    // Build daily dates for past 365 days
     const dates = [];
-    for (let i = 12; i >= 1; i--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    for (let i = 365; i >= 1; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
       dates.push(d.toISOString().slice(0,10));
     }
-    const todo = dates.filter(dateStr => {
-      const ym = dateStr.slice(0,7);
-      return !CURRENCIES.every(c =>
-        trend[c.code] && trend[c.code].some(x => x.d.slice(0,7) === ym)
-      );
-    });
+    // Filter out dates we already have
+    const todo = dates.filter(dateStr =>
+      !CURRENCIES.every(c =>
+        trend[c.code] && trend[c.code].some(x => x.d === dateStr)
+      )
+    );
+    if (todo.length === 0) {
+      btn.textContent = '✓ 已是最新';
+      setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2000);
+      return;
+    }
     btn.textContent = `載入中 0/${todo.length}...`;
+    let fetched = 0;
     for (const dateStr of todo) {
       try {
-        // OXR historical: base is USD, free plan only
         const res = await fetch(
           `https://openexchangerates.org/api/historical/${dateStr}.json?app_id=${OXR_KEY}&symbols=TWD,MYR,EUR,CNY,AUD,SGD`
         );
@@ -389,8 +395,6 @@ async function fetchHistory() {
           } else {
             const cPerUsd = data.rates[c.code];
             if (!cPerUsd) return;
-            // 1 TWD = cPerUsd / twdPerUsd foreign currency
-            // 1 foreign = twdPerUsd / cPerUsd TWD
             val = parseFloat((twdPerUsd / cPerUsd).toFixed(4));
           }
           arr.push({ d: dateStr, v: val });
@@ -398,14 +402,14 @@ async function fetchHistory() {
         fetched++;
         btn.textContent = `載入中 ${fetched}/${todo.length}...`;
       } catch(e) { continue; }
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 250));
     }
     CURRENCIES.forEach(c => {
       if (trend[c.code]) trend[c.code].sort((a,b) => a.d.localeCompare(b.d));
     });
     save();
     renderChart();
-    btn.textContent = fetched > 0 ? `✓ 已載入 ${fetched} 筆` : '✓ 已是最新';
+    btn.textContent = `✓ 已載入 ${fetched} 筆`;
     setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 3000);
   } catch(e) {
     console.error(e);
