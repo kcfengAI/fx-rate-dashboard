@@ -585,6 +585,61 @@ async function fetchHistory() {
   }
 }
 
+
+// ── Period selection ──────────────────────────────
+let activePeriod = 7;
+
+function setPeriod(days) {
+  activePeriod = days;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  const idMap = {7:'p7',30:'p30',90:'p90',180:'p180',365:'p365',730:'p730',1095:'p1095'};
+  const el = document.getElementById(idMap[days]);
+  if (el) el.classList.add('active');
+  renderChart();
+}
+
+async function fetchHistory() {
+  const btn = document.getElementById('fetch-hist-btn');
+  btn.textContent = '載入中...';
+  btn.disabled = true;
+  try {
+    const today = new Date();
+    const requests = [];
+    for (let monthsAgo = 35; monthsAgo >= 1; monthsAgo--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
+      const dateStr = d.toISOString().slice(0,10);
+      requests.push(dateStr);
+    }
+    for (const dateStr of requests) {
+      const existing = Object.values(trend).some(arr => arr.some(x => x.d === dateStr));
+      if (existing) continue;
+      const res = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/history/TWD/${dateStr}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.result !== 'success') continue;
+      CURRENCIES.forEach(c => {
+        if (!trend[c.code]) trend[c.code] = [];
+        const r = data.conversion_rates?.[c.code];
+        if (!r) return;
+        const val = parseFloat((1/r).toFixed(4));
+        const arr = trend[c.code];
+        if (!arr.some(x => x.d === dateStr)) {
+          arr.push({ d: dateStr, v: val });
+          arr.sort((a,b) => a.d.localeCompare(b.d));
+        }
+      });
+      await new Promise(r => setTimeout(r, 300));
+    }
+    save();
+    renderChart();
+    btn.textContent = '✓ 已載入';
+    setTimeout(() => { btn.textContent = '↓ 載入歷史'; btn.disabled = false; }, 2000);
+  } catch(e) {
+    btn.textContent = '↓ 載入歷史';
+    btn.disabled = false;
+  }
+}
+
   fetchRates();
   setInterval(fetchRates,5*60*1000);
 })();
